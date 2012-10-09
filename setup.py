@@ -24,7 +24,7 @@ package_data = {
 
 setup(name='django-bootstrap-admin-templates',
       version=bootstrap_admin_templates.__version__,
-      description=bootstrap_admin_templates.__description__,
+      description=bootstrap_admin_templates.__doc__,
       author='Marcus R. Brown (Precision Mojo, LLC)',
       author_email='mrbrown@precision-mojo.com',
       url='https://github.com/Precision-Mojo/django-bootstrap-admin-templates',
