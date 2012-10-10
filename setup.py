@@ -22,6 +22,10 @@ package_data = {
     ],
 }
 
+install_requires = [
+    'django-bootstrap-toolkit>=2.5.9',
+]
+
 setup(name='django-bootstrap-admin-templates',
       version=bootstrap_admin_templates.__version__,
       description=bootstrap_admin_templates.__doc__,
@@ -30,6 +34,7 @@ setup(name='django-bootstrap-admin-templates',
       url='https://github.com/Precision-Mojo/django-bootstrap-admin-templates',
       packages=packages,
       package_data=package_data,
+      install_requires=install_requires,
       classifiers=[
           'Development Status :: 4 - Beta',
           'Environment :: Web Environment',

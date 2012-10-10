@@ -1,8 +1,16 @@
 {% load i18n %}
-<ul class="nav nav-list">
-    <li class="nav-header">{% blocktrans with title as filter_title %} By {{ filter_title }} {% endblocktrans %}</li>
-    {% for choice in choices %}
-    <li{% if choice.selected %} class="active"{% endif %}><a href="{{ choice.query_string|iriencode }}">{{ choice.display }}</a></li>
-    {% endfor %}
-    <li class="divider"></li>
-</ul>
+<div class="accordion-group">
+    <div class="accordion-heading">
+        <a class="accordion-toggle" data-toggle="collapse" data-parent="#filters" href="#collapse-{{ title|slugify }}">
+            {% blocktrans with title as filter_title %} By {{ filter_title }} {% endblocktrans %}
+        </a>
+    </div>
+    <div id="collapse-{{ title|slugify }}" class="accordion-body collapse">
+        <ul class="nav nav-list">
+            <li class="nav-header"></li>
+            {% for choice in choices %}
+            <li{% if choice.selected %} class="active"{% endif %}><a href="{{ choice.query_string|iriencode }}">{{ choice.display }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>

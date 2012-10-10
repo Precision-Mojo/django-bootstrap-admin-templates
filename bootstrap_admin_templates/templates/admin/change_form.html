@@ -1,15 +1,15 @@
 {% extends "admin/base_site.html" %}
-{% load i18n admin_modify adminmedia %}
+{% load i18n admin_modify admin_static %}
 {% load url from future %}
 
 {% block extrahead %}{{ block.super }}
-    <script type="text/javascript">window.__admin_media_prefix__ = "{% admin_media_prefix %}";</script>
+    <script type="text/javascript">window.__admin_media_prefix__ = "{% static 'admin/' %}";</script>
 {% url 'admin:jsi18n' as jsi18nurl %}
 <script type="text/javascript" src="{{ jsi18nurl|default:"../../../jsi18n/" }}"></script>
 {{ media }}
 {% endblock %}
 
-{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% admin_media_prefix %}css/forms.css" />{% endblock %}
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}" />{% endblock %}
 
 {% block coltype %}{% if ordered_objects %}colMS{% else %}colM{% endif %}{% endblock %}
 
@@ -17,7 +17,7 @@
 
 {% block breadcrumbs %}{% if not is_popup %}
 <ul class="breadcrumb">
-    <li><a href="../../../">{% trans "Home" %}</a> <span class="divider">/</span></li>
+    <li><a href="../../../"><i class="icon-home"></i> {% trans "Home" %}</a> <span class="divider">/</span></li>
     <li><a href="../../">{{ app_label|capfirst|escape }}</a> <span class="divider">/</span></li>
     {% if has_change_permission %}<li><a href="../">{{ opts.verbose_name_plural|capfirst }}</a> <span class="divider">/</span></li>{% else %}
     <li class="active">{{ opts.verbose_name_plural|capfirst }}</li>{% endif %}
@@ -29,38 +29,51 @@
 {% block content %}<div id="content-main">
 {% block object-tools %}
 {% if change %}{% if not is_popup %}
-  <div class="object-tools">
-    {% block object-tools-items %}
-    <a href="history/" class="btn">{% trans "History" %}</a>
-    {% if has_absolute_url %}<li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
-    {% endblock %}
-  </div>
+    <div class="navbar">
+        <div class="navbar-inner">
+            {% block object-tools-items %}
+            <ul class="nav pull-right">
+                <li><a href="history/"><i class="icon-time"></i> {% trans "History" %}</a></li>
+                {% if has_absolute_url %}
+                <li>
+                    <a href="../../../r/{{ content_type_id }}/{{ object_id }}/"><i class="icon-external-link"></i> {% trans "View on site" %}</a>
+                </li>
+                {% endif %}
+            </ul>
+            {% endblock %}
+        </div>
+    </div>
 {% endif %}{% endif %}
 {% endblock %}
-<form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="{{ form_url }}" method="post" id="{{ opts.module_name }}_form">{% csrf_token %}{% block form_top %}{% endblock %}
+<form class="form-horizontal" {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="{{ form_url }}" method="post" id="{{ opts.module_name }}_form">{% csrf_token %}{% block form_top %}{% endblock %}
 <div>
 {% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
-{% if save_on_top %}{% submit_row %}{% endif %}
+{% if save_on_top %}{% block submit_buttons_top %}{% submit_row %}{% endblock %}{% endif %}
 {% if errors %}
     <p class="alert alert-error">
-    {% blocktrans count errors|length as counter %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}
+        <button type="button" class="close" data-dismiss="alert">×</button>
+        {% blocktrans count errors|length as counter %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}
     </p>
     {{ adminform.form.non_field_errors }}
 {% endif %}
 
+{% block field_sets %}
 {% for fieldset in adminform %}
   {% include "admin/includes/fieldset.html" %}
 {% endfor %}
+{% endblock %}
 
 {% block after_field_sets %}{% endblock %}
 
+{% block inline_field_sets %}
 {% for inline_admin_formset in inline_admin_formsets %}
     {% include inline_admin_formset.opts.template %}
 {% endfor %}
+{% endblock %}
 
 {% block after_related_objects %}{% endblock %}
 
-{% submit_row %}
+{% block submit_buttons_bottom %}<div class="form-actions">{% submit_row %}</div>{% endblock %}
 
 {% if adminform and add %}
    <script type="text/javascript">document.getElementById("{{ adminform.first_field.id_for_label }}").focus();</script>
