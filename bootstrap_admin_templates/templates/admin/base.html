@@ -1,10 +1,14 @@
-{% load url from future %}<!DOCTYPE html>
+{% load admin_static %}{% load url from future %}{% load bootstrap_toolkit %}<!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE|default:"en-us" }}" xml:lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
     <head>
         <meta charset="utf-8">
         <title>{% block title %}{% endblock %}</title>
-        <link rel="stylesheet" type="text/css" href="/admins/css/bootstrap.css" />
-        <link rel="stylesheet" type="text/css" href="/admins/css/rewrite.css" />
+        <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css' %}" />
+        <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap-responsive.css' %}" />
+        <!--[if lt IE 9]>
+          <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+        <script type="text/javascript">window.__admin_media_prefix__ = "{% filter escapejs %}{% static "admin/" %}{% endfilter %}";</script>
         {% block extrastyle %}{% endblock %}
         {% block extrahead %}{% endblock %}
         {% block blockbots %}
@@ -14,20 +18,23 @@
     {% load i18n %}
     <body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}">
         {% if not is_popup %}
+        <!-- Header -->
         {% if user.is_active and user.is_staff %}
         <div class="navbar navbar-inverse">
             <div class="navbar-inner">
                 <div class="container">
-				<a class="brand" href="/">{% trans 'Home' %}</a>
+                    <a class="brand" href="{% url 'admin:index' %}">{% block branding %}{% endblock %}</a>
                     <div class="nav-collapse">
                         <ul class="nav">
                             <li id="welcome" class="active">
                                 <a href="/admin"> {% trans 'Welcome,' %}{% filter force_escape %}{% firstof user.first_name user.username %}{% endfilter %}</a>
                             </li>
+                            {% block userlinks %}
                             {% url 'django-admindocs-docroot' as docsroot %}
                             {% if docsroot %}
                             <li><a href="{{ docsroot }}">{% trans 'Documentation' %}</a></li>
                             {% endif %}
+                            {% endblock %}
 
                             {% url 'admin:password_change' as password_change_url %}
                                 {% if password_change_url %}
@@ -49,36 +56,34 @@
             </div>
         </div>
         {% endif %}
-
+        <!-- END Header -->
         {% endif %}
-
-        {% block userlinks %}{% endblock %}
 
         {% block mainbody %}
         <div class="main {% block coltype %}colM{% endblock %}">
 
-            {% if messages %}
-            <div class="alert alert-success">
-                <ul class="messagelist">
-                    {% for message in messages %}
-                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
-                        {{ message }}
-                    </li>
-                    {% endfor %}
-                </ul>
-            </div>
-            {% endif %}
-            
             {% block breadcrumbs %}
             <ul class="breadcrumb">
-                <li><a href="/">{% trans 'Home' %}</a> <span class="divider">/</span></li>
+                <li><a href="{% url 'admin:index' %}">{% trans 'Home' %}</a> <span class="divider">/</span></li>
                 <li class="active">{% if title %} {{ title }}{% endif %}</li>
             </ul>
             {% endblock %}
-            
+
+            {% block messages %}
+              {% if messages %}
+                  {% for message in messages %}
+                  <div class="alert{% if message.tags %} {{ message.tags }}{% endif %}">
+                      <a href="#" class="close" data-dismiss="alert">×</a>
+                      {{ message }}
+                  </div>
+                  {% endfor %}
+              {% endif %}
+            {% endblock messages %}
+
+            <!-- Content -->
             {% block pretitle %}{% endblock %}
             {% block content_title %}
-                {% if title %}  
+                {% if title %}
                 <div class="page-header">
                     <h3>{{ title }}</h3>
                 </div>
@@ -95,9 +100,13 @@
                     {% block sidebar %}{% endblock %}
                 </div>
             </div>
-            
+            <!-- END Content -->
+
             {% block footer %}{% endblock %}
         </div>
         {% endblock %}
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="{% static 'js/lib/jquery-1.8.2.min.js' %}"><\/script>')</script>
+        <script src="{% static 'js/bootstrap-alert.js' %}"></script>
     </body>
 </html>
