@@ -12,69 +12,67 @@
 {% block content %}
 <div id="content-main">
 
-{% if app_list %}
-    {% for app in app_list %}
-        <table class="table table-bordered table-striped" summary="{% blocktrans with app.name as name %}Models available in the {{ name }} application.{% endblocktrans %}">
-            <tr>
-                <th colspan="2" class="title"><a href="{{ app.app_url }}" class="section">{% blocktrans with app.name as name %}{{ name }}{% endblocktrans %}</a></th>
-            </tr>
-        {% for model in app.models %}
-            <tr>
+{% for app in app_list %}
+    <table class="table table-bordered table-striped" summary="{% blocktrans with app.name as name %}Models available in the {{ name }} application.{% endblocktrans %}">
+        <tr>
+            <th colspan="2" class="title"><a href="{{ app.app_url }}" class="section">{% blocktrans with app.name as name %}{{ name }}{% endblocktrans %}</a></th>
+        </tr>
+    {% for model in app.models %}
+        <tr>
+            <th scope="row" width="100%">
             {% if model.perms.change %}
-                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
+                <a href="{{ model.admin_url }}">{{ model.name }}</a>
             {% else %}
-                <th scope="row">{{ model.name }}</th>
+                {{ model.name }}
             {% endif %}
-                <td width="20%">
-                 <div data-toggle="buttons-checkbox" class="btn-group">
-                     {% if model.perms.add %}
-                     <a href="{{ model.admin_url }}add/" class="btn">{% trans 'Add' %}</a>
-                     {% endif %}
-                     {% if model.perms.change %}
-                     <a href="{{ model.admin_url }}" class="btn">{% trans 'Change' %}</a>
-                     {% endif %}
-                 </div>
-                </td>
-            </tr>
-        {% endfor %}
-        </table>
+            </th>
+            <td>
+                <div data-toggle="buttons-checkbox" class="btn-group">
+                    {% if model.perms.add %}
+                    <a href="{{ model.admin_url }}add/" class="btn"><i class='icon-plus-sign'></i></a>
+                    {% endif %}
+                    {% if model.perms.change %}
+                    <a href="{{ model.admin_url }}" class="btn"><i class='icon-pencil'></i></a>
+                    {% endif %}
+                </div>
+            </td>
+        </tr>
     {% endfor %}
-{% else %}
-    <p>{% trans "You don't have permission to edit anything." %}</p>
-{% endif %}
+    </table>
+{% empty %}
+    <p><i class="icon-lock"></i>{% trans "You don't have permission to edit anything." %}</p>
+{% endfor %}
 </div>
 {% endblock %}
 
 {% block sidebar %}
-<div class="well">
-    <ul class="nav nav-list">
-        <li class="nav-header">{% trans 'Recent Actions' %}</li>
-        <li class="divider"></li>
-        <li class="nav-header">{% trans 'My Actions' %}</li>
+<div class="well" id="recent-actions-module">
+    <h3>{% trans 'My Actions' %}</h3>
+    {% load log %}
+    {% get_admin_log 10 as admin_log for_user user %}
+    <ul class="unstyled">
+    {% for entry in admin_log %}
         <li>
-          {% load log %}
-        </li>
-        {% get_admin_log 10 as admin_log for_user user %}
-        {% if not admin_log %}
-        <li>
-             <p class="tip">{% trans 'None available' %}</p>
-        </li>
-        {% for entry in admin_log %}
-        <li class="{% if entry.is_addition %}addlink{% endif %}{% if entry.is_change %}changelink{% endif %}{% if entry.is_deletion %}deletelink{% endif %}">
+            <i class="icon-{% if entry.is_addition %}plus-sign{% endif %}{% if entry.is_change %}pencil{% endif %}{% if entry.is_deletion %}remove-sign{% endif %}"></i>
             {% if entry.is_deletion or not entry.get_admin_url %}
                 {{ entry.object_repr }}
             {% else %}
                 <a href="{{ entry.get_admin_url }}">{{ entry.object_repr }}</a>
             {% endif %}
             <br/>
+            <p class="muted"><small>
             {% if entry.content_type %}
-                <span class="mini quiet">{% filter capfirst %}{% trans entry.content_type.name %}{% endfilter %}</span>
+                {% filter capfirst %}{% trans entry.content_type.name %}{% endfilter %}
             {% else %}
-                <span class="mini quiet">{% trans 'Unknown content' %}</span>
+                {% trans 'Unknown content' %}
             {% endif %}
+            </small></p>
         </li>
-        {% endfor %}
-        {% endif %}
+    {% empty %}
+        <li>
+             <p class="tip">{% trans 'None available' %}</p>
+        </li>
+    {% endfor %}
     </ul>
 </div>
 {% endblock %}

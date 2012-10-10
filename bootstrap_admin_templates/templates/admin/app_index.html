@@ -5,7 +5,7 @@
 
 {% block breadcrumbs %}
 <ul class="breadcrumb">
-    <li><a href="../">{% trans "Home" %}</a> <span class="divider">/</span></li>
+    <li><a href="../"><i class="icon-home"></i> {% trans "Home" %}</a> <span class="divider">/</span></li>
     <li class="active">{% for app in app_list %}
     {% blocktrans with app.name as name %}{{ name }}{% endblocktrans %}
     {% endfor %}</li>
