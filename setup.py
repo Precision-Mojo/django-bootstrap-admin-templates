@@ -19,6 +19,7 @@ package_data = {
         'templates/admin/edit_inline/*.html',
         'templates/admin/includes/*.html',
         'templates/admin/registration/*.html',
+        'static/bootstrap_admin/templates/css/*.css',
     ],
 }
 
